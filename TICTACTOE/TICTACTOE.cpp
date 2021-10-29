@@ -189,49 +189,51 @@ void play_menu() {
     //Transfers to the game session
    winner = game_session(player1_name, player2_name);
 
-   if (winner == player1_name) {
-      bool recorded =  record(player1_name, player2_name, winner);
-       cout << "WINNER: " << player1_name << " LOOSER: " << player2_name << endl;
+   //if (winner == player1_name) {
+   //   bool recorded =  record(player1_name, player2_name, winner);
+   //    cout << "WINNER: " << player1_name << " LOOSER: " << player2_name << endl;
 
-       cout << "WOULD YOU LIKE TO PLAY AGAIN?\n1 - YES\n2 - NO\n";
-       int opt = input_validator(1, 2);
-       if (opt == 1) {
-           system("CLS");
-           winner = game_session(player1_name, player2_name);
-       }
-       else {
-           home();
-       }
-   }
+   //    cout << "WOULD YOU LIKE TO PLAY AGAIN?\n1 - YES\n2 - NO\n";
+   //    int opt = input_validator(1, 2);
+   //    if (opt == 1) {
+   //        system("CLS");
+   //        winner = game_session(player1_name, player2_name);
+   //    }
+   //    else {
+   //        home();
+   //    }
+   //}
 
-   else if (winner == player2_name) {
-       bool recorded = record(player1_name, player2_name, winner);
-       cout << "WINNER: " << player2_name << " LOOSER: " << player1_name << endl;
+   //else if (winner == player2_name) {
+   //    bool recorded = record(player1_name, player2_name, winner);
+   //    cout << "WINNER: " << player2_name << " LOOSER: " << player1_name << endl;
 
-       cout << "WOULD YOU LIKE TO PLAY AGAIN?\n1 - YES\n2 - NO\n";
-       int opt = input_validator(1, 2);
-       if (opt == 1) {
-           system("CLS");
-           winner = game_session(player1_name, player2_name);
-       }
-       else {
-           home();
-       }
-   }
-   else {
-       bool recorded = record(player1_name, player2_name, winner);
-       cout << "WOULD YOU LIKE TO PLAY AGAIN?\n1 - YES\n2 - NO\n";
-       int opt = input_validator(1, 2);
-       if (opt == 1) {
-           system("CLS");
-           winner = game_session(player1_name, player2_name);
-       }
-       else {
-           home();
-       }
-   }
+   //    cout << "WOULD YOU LIKE TO PLAY AGAIN?\n1 - YES\n2 - NO\n";
+   //    int opt = input_validator(1, 2);
+   //    if (opt == 1) {
+   //        system("CLS");
+   //        winner = game_session(player1_name, player2_name);
+   //        bool recorded = record(player1_name, player2_name, winner);
+   //        cout << "WINNER: " << player2_name << " LOOSER: " << player1_name << endl;
+   //    }
+   //    else {
+   //        home();
+   //    }
+   //}
+   //else {
+   //    bool recorded = record(player1_name, player2_name, winner);
+   //    cout << "WOULD YOU LIKE TO PLAY AGAIN?\n1 - YES\n2 - NO\n";
+   //    int opt = input_validator(1, 2);
+   //    if (opt == 1) {
+   //        system("CLS");
+   //        winner = game_session(player1_name, player2_name);
+   //    }
+   //    else {
+   //        home();
+   //    }
+   //}
 
-   
+   //
 
 }
 
@@ -319,6 +321,57 @@ string game_session(string player_1, string player_2) {
             winner = "draw";
             won = true;
             break;
+        }
+    }
+
+    bool repeat{ true };
+    while (repeat == true) {
+
+        if (winner == player_1) {
+            bool recorded = record(player_1, player_2, winner);
+            cout << "WINNER: " << player_1 << " LOOSER: " << player_2 << endl;
+
+            cout << "WOULD YOU LIKE TO PLAY AGAIN?\n1 - YES\n2 - NO\n";
+            int opt = input_validator(1, 2);
+            if (opt == 1) {
+                system("CLS");
+                winner = game_session(player_1, player_2);
+            }
+            else {
+                repeat = false;
+                home();
+            }
+        }
+
+        else if (winner == player_2) {
+            bool recorded = record(player_1, player_2, winner);
+            cout << "WINNER: " << player_2 << " LOOSER: " << player_1 << endl;
+
+            cout << "WOULD YOU LIKE TO PLAY AGAIN?\n1 - YES\n2 - NO\n";
+            int opt = input_validator(1, 2);
+            if (opt == 1) {
+                system("CLS");
+                winner = game_session(player_1, player_2);
+                bool recorded = record(player_1, player_2, winner);
+                cout << "WINNER: " << player_2 << " LOOSER: " << player_1 << endl;
+            }
+            else {
+                repeat = false;
+                home();
+            }
+        }
+        else {
+            bool recorded = record(player_1, player_2, winner);
+            cout << "WOULD YOU LIKE TO PLAY AGAIN?\n1 - YES\n2 - NO\n";
+            int opt = input_validator(1, 2);
+            if (opt == 1) {
+                system("CLS");
+                winner = game_session(player_1, player_2);
+            }
+            else {
+                repeat = false;
+                home();
+            }
         }
     }
 
@@ -566,5 +619,6 @@ void check_record() {
 }
 
 void about() {
-
+    system("CLS");
+    cout << "\t\t\tABOUT THE GAME\n\nTHE FIRST PLAYER IS ALWAYS THE X\nTHIS GAME IS ALSO CALLED TIC TAC TOE\nTHE RESULTS OF PREVIOUS GAMES PLAYED CAN BE SEEN HERE\nCHOOSE A NUMBER TO INDICATE WHERE YOU WOULD LIKE YOUR LETTER PLACED\nTHIS IS THE TYPICAL X and 0 GAME\n\n\nENJOY!\n\n\n";
 }
