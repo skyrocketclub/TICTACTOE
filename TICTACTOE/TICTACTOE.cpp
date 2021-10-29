@@ -43,17 +43,41 @@ MAIN MENU
 
 #include <iostream>
 #include <sstream>
+#include <algorithm>
+#include <cctype>
+#include <map>
+#include <vector>
+#include <iomanip>
+
+
 
 using std::cout;
 using std::cin;
 using std::endl;
 using std::getline;
+using std::string;
+using std::map;
+using std::vector;
 
+//FUNCTION PROTOTYPES
 int input_validator(int, int);
 void home();
 void quit();
 void play_menu();
+string game_session(string, string);
+string capitalise(string);
+//int count_slots(std:: map<int, char> &);
+void display_grid(std::map<int, char> &);
+bool change_face(std::map<int, char>&, int, char);
+bool check_won(std::map<int, char>&, char);
 
+/*
+            1 - Implement the lines...
+            2 - Implement the score sheet for record purposes...
+            3 - Implement the about game...
+*/
+
+//UNIVERSAL VARIABLE THAT IS USED OR QUITTING THE PROGRAM.
 char quitter{ '1' };
 
 int main()
@@ -83,36 +107,42 @@ int input_validator(int min, int max) {
 }
 
 void home() {
-    while (quitter != '0') {
-        system("CLS");
+    if (quitter == '1') {
+       /* system("CLS");*/
         int option;
 
-        cout << "1 - PLAY TIC TAC TOE\n2 VIEW PREVIOUS DUELS\n3 - ABOUT GAME\n4 - QUIT GAME\n";
+        cout << "\t\t\t================================================================================================================" << endl;
+        cout << "\t\t\t|                                            TIC - TAC - TOE                                                   |" << endl;
+        cout << "\t\t\t================================================================================================================" << endl;
+
+        cout << "1 - PLAY TIC TAC TOE\n2 - VIEW PREVIOUS DUELS\n3 - ABOUT GAME\n4 - QUIT GAME\n";
         option = input_validator(1, 4);
         
         switch (option)
         {
-            case '1':
+            case 1:
             {
-
+                play_menu();
+                home();
             }
             break;
 
-            case '2':
+            case 2:
             {
-
+                home();
             }
             break;
 
-            case '3':
+            case 3:
             {
-
+                home();
             }
             break;
 
-            case '4':
+            case 4:
             {
                 quit();
+                home();
             }
             break;
 
@@ -120,6 +150,9 @@ void home() {
                 break;
         }
     }
+   /* else {
+        quit();
+    }*/
 }
 
 void quit() {
@@ -133,15 +166,327 @@ void quit() {
 
 void play_menu() {
     system("CLS");
-    std::string player1_name, player2_name;
+    std::string player1_name, player2_name, winner;
 
+    cin.ignore(1, '\n');
     cout << "\t\t\tSETTLE THE DISPUTES HERE WITH A TIC TAC TOE DUEL\n";
     cout << "\t\t\tPLAYER 1 (X -- FIRST TO PLAY)\nNICK NAME: ";
     getline(cin, player1_name);
+    player1_name = capitalise(player1_name);
     cout << endl;
 
     cout << "\t\t\tPLAYER 2 (O -- SECOND TO PLAY)\nNICK NAME: ";
     getline(cin, player2_name);
+    player2_name = capitalise(player2_name);
 
+    //Transfers to the game session
+   winner = game_session(player1_name, player2_name);
+
+   if (winner == player1_name) {
+       cout << "WINNER: " << player1_name << " LOOSER: " << player2_name << endl;
+
+       cout << "WOULD YOU LIKE TO PLAY AGAIN?\n1 - YES\n2 - NO\n";
+       int opt = input_validator(1, 2);
+       if (opt == 1) {
+           system("CLS");
+           winner = game_session(player1_name, player2_name);
+       }
+       else {
+           home();
+       }
+   }
+
+   else if (winner == player2_name) {
+       cout << "WINNER: " << player2_name << " LOOSER: " << player1_name << endl;
+
+       cout << "WOULD YOU LIKE TO PLAY AGAIN?\n1 - YES\n2 - NO\n";
+       int opt = input_validator(1, 2);
+       if (opt == 1) {
+           system("CLS");
+           winner = game_session(player1_name, player2_name);
+       }
+       else {
+           home();
+       }
+   }
+   else {
+       cout << "WOULD YOU LIKE TO PLAY AGAIN?\n1 - YES\n2 - NO\n";
+       int opt = input_validator(1, 2);
+       if (opt == 1) {
+           system("CLS");
+           winner = game_session(player1_name, player2_name);
+       }
+       else {
+           home();
+       }
+   }
 }
 
+string game_session(string player_1, string player_2) {
+    system("CLS");
+    cout << "\t\t\t" << player_1 << "\t\tvs\t\t" << player_2 << "\n";
+    std::string winner{};
+    bool won{ false };
+    int num_slots{9},number;
+    char input{ 'x' };
+    map <int, char> slots{ {1,'P'},{2,'P'},{3,'P'},{4,'P'},{5,'P'},{6,'P'},{7,'P'},{8,'P'},{9,'P'}};
+  
+
+
+    //while num of slots > 0 && won == false
+    while (won == false ) {
+
+        display_grid(slots); //display the numbers at first
+       
+        retry: cout << player_1 << " (X)";
+        number = input_validator(1, 9);
+        bool changed = change_face(slots, number, 'X');//confirms if your input was successful
+
+        if (changed == true) {
+            num_slots--;
+            won = check_won(slots,'X');
+            if (won == true) {
+                /*cout << "WINNER: " << player_1 << " LOOSER: " << player_2 << endl;*/
+                display_grid(slots);
+                winner = player_1;
+                continue;
+            }
+           
+        }
+        else {
+             //IT MEANS THAT THE NUMBER IS NO LONGER AVAILABLE AND IS NOW A LETTER
+            cout << "INVALID OPTION - CHOOSE A NUMBER\n";
+            goto retry;
+        }
+
+
+
+
+        if (num_slots == 0) {
+            cout << endl;
+            cout << "GAME OVER - RESULT: DRAW\n";
+            display_grid(slots);
+            winner = "draw";
+            won = true;
+            break;
+        }
+
+        //Go again for o
+        display_grid(slots);
+
+        retry2: cout << player_2 << " (O)";
+        number = input_validator(1, 9);
+        changed = change_face(slots, number, 'O');//confirms if you have changed the number before
+
+        if (changed == true) {
+            num_slots--;
+            won = check_won(slots,'O');
+
+            if (won == true) {
+                /*cout << "WINNER: " << player_2 << " LOOSER: " << player_1 << endl;*/
+                display_grid(slots);
+                winner = player_2;
+                continue;
+            }
+           
+        }
+
+
+        else {
+            //IT MEANS THAT THE NUMBER IS NO LONGER AVAILABLE AND IS NOW A LETTER
+            cout << "INVALID OPTION - CHOOSE A NUMBER\n";
+            goto retry2;
+        }
+
+       
+        if (num_slots == 0) {
+            cout << endl;
+            cout << "GAME OVER - RESULT: DRAW\n";
+            display_grid(slots);
+            winner = "draw";
+            won = true;
+            break;
+        }
+    }
+
+    return winner;
+}
+
+string capitalise(string word) {
+    std::transform(word.begin(), word.end(), word.begin(), toupper);
+    return word;
+}
+
+//int count_slots(std::map<int, char> &slots) {
+//    //to count howmany slots are still p which is the code word for pending
+//    //if the number is 0, it means that a stale_mate has been arrived at
+//    // map <int, char> slots{ {1,'P'},{2,'P'},{3,'P'},{4,'P'},{5,'P'},{6,'P'},{7,'P'},{8,'P'},{9,'P'}};
+//
+//    int number{0};
+//    auto it = slots.begin();
+//
+//    while (it != slots.end()) {
+//        if (it->second == 'P')
+//            number++;
+//        it++;
+//    }
+//
+//    return number;
+//}
+
+void display_grid(std::map<int, char> &slots) {
+    cout << endl;
+    auto it = slots.begin();
+    int count{ 1 }, line_count{ 0 };
+
+    while (it != slots.end()) {
+        if (count % 3 == 0) {
+            if (it->second == 'P') {
+                std::cout << std::setw(3) << std::left << it->first << "  ";
+            }
+            else {
+                std::cout << std::setw(3) << std::left << it->second << "  ";
+            }
+            it++;
+
+            if (line_count == 2) {
+
+            }
+            else {
+                if (count % 3 == 0) {
+                    cout << endl << "------------" << endl;
+                    line_count++;
+                }
+            }
+
+
+            count++;
+        }
+        else {
+            if (it->second == 'P') {
+                std::cout << std::setw(3) << std::left << it->first << "| ";
+            }
+            else {
+                std::cout << std::setw(3) << std::left << it->second << "| ";
+            }
+            it++;
+
+            if (line_count == 2) {
+
+            }
+            else {
+                if (count % 3 == 0) {
+                    cout << endl << "------------" << endl;
+                    line_count++;
+                }
+            }
+
+
+            count++;
+        }
+        
+    }
+    cout << endl<<endl;
+}
+
+bool change_face(std::map<int, char>& slots, int num, char letter) {
+    //change the value of the given integer to x or to o
+    bool done { false };
+    auto it = slots.begin();
+    while (it != slots.end()) {
+        if (it->first == num) { //if it has not been changed
+            if (it->second == 'P') {
+                it->second = letter;
+                done = true;
+            }
+            else{}
+        }
+        it++;
+    }
+    return done;
+}
+
+bool check_won(std::map<int, char>& slots, char letter) {
+    bool won{ false };
+
+    auto it1 = slots.find(1);
+    auto it2 = slots.find(4);
+    auto it3 = slots.find(7);
+
+    if (it1->second == it2->second && it1->second  == it3->second && it1-> second == letter) {
+        won = true;
+    }
+
+    it1 = slots.find(2);
+    it2 = slots.find(5);
+    it3 = slots.find(8);
+
+    if (it1->second == it2->second && it1->second == it3->second && it1->second == letter) {
+        won = true;
+    }
+
+    it1 = slots.find(3);
+    it2 = slots.find(6);
+    it3 = slots.find(9);
+
+    if (it1->second == it2->second && it1->second == it3->second && it1->second == letter) {
+        won = true;
+    }
+
+    it1 = slots.find(1);
+    it2 = slots.find(2);
+    it3 = slots.find(3);
+
+    if (it1->second == it2->second && it1->second == it3->second && it1->second == letter) {
+        won = true;
+    }
+
+    it1 = slots.find(4);
+    it2 = slots.find(5);
+    it3 = slots.find(6);
+
+    if (it1->second == it2->second && it1->second == it3->second && it1->second == letter) {
+        won = true;
+    }
+
+    it1 = slots.find(7);
+    it2 = slots.find(8);
+    it3 = slots.find(9);
+
+    if (it1->second == it2->second && it1->second == it3->second && it1->second == letter) {
+        won = true;
+    }
+
+    it1 = slots.find(1);
+    it2 = slots.find(5);
+    it3 = slots.find(9);
+
+    if (it1->second == it2->second && it1->second == it3->second && it1->second == letter) {
+        won = true;
+    }
+
+    it1 = slots.find(3);
+    it2 = slots.find(5);
+    it3 = slots.find(7);
+
+    if (it1->second == it2->second && it1->second == it3->second && it1->second == letter) {
+        won = true;
+    }
+    return won;
+}
+
+
+
+//Define a vactor of maps with 9 maps
+   //Display
+   /*
+           1   2   3
+
+           4   5   6
+
+           7   8   9
+
+           to win (the values of the maps of the following must be the same... either (' X ' or ' O ')
+    (1 == 4 == 7) || (2 == 5 == 8) || (3 == 6 == 9) || (1 == 2 == 3) || ( 4 == 5 == 6 ) || (7 == 8 == 9 ) || (1 == 5 == 9) || (3 == 5 == 7)
+
+   */
