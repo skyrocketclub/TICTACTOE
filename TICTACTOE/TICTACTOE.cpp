@@ -48,11 +48,13 @@ MAIN MENU
 #include <map>
 #include <vector>
 #include <iomanip>
+#include <fstream>
 
 
 
 using std::cout;
 using std::cin;
+using std::cerr;
 using std::endl;
 using std::getline;
 using std::string;
@@ -70,9 +72,12 @@ string capitalise(string);
 void display_grid(std::map<int, char> &);
 bool change_face(std::map<int, char>&, int, char);
 bool check_won(std::map<int, char>&, char);
+bool record(string, string, string);
+void check_record();
+void about();
 
 /*
-            1 - Implement the lines...
+           
             2 - Implement the score sheet for record purposes...
             3 - Implement the about game...
 */
@@ -129,12 +134,14 @@ void home() {
 
             case 2:
             {
+                check_record();
                 home();
             }
             break;
 
             case 3:
             {
+                about();
                 home();
             }
             break;
@@ -183,6 +190,7 @@ void play_menu() {
    winner = game_session(player1_name, player2_name);
 
    if (winner == player1_name) {
+      bool recorded =  record(player1_name, player2_name, winner);
        cout << "WINNER: " << player1_name << " LOOSER: " << player2_name << endl;
 
        cout << "WOULD YOU LIKE TO PLAY AGAIN?\n1 - YES\n2 - NO\n";
@@ -197,6 +205,7 @@ void play_menu() {
    }
 
    else if (winner == player2_name) {
+       bool recorded = record(player1_name, player2_name, winner);
        cout << "WINNER: " << player2_name << " LOOSER: " << player1_name << endl;
 
        cout << "WOULD YOU LIKE TO PLAY AGAIN?\n1 - YES\n2 - NO\n";
@@ -210,6 +219,7 @@ void play_menu() {
        }
    }
    else {
+       bool recorded = record(player1_name, player2_name, winner);
        cout << "WOULD YOU LIKE TO PLAY AGAIN?\n1 - YES\n2 - NO\n";
        int opt = input_validator(1, 2);
        if (opt == 1) {
@@ -220,6 +230,9 @@ void play_menu() {
            home();
        }
    }
+
+   
+
 }
 
 string game_session(string player_1, string player_2) {
@@ -266,7 +279,7 @@ string game_session(string player_1, string player_2) {
             cout << endl;
             cout << "GAME OVER - RESULT: DRAW\n";
             display_grid(slots);
-            winner = "draw";
+            winner = "DRAW";
             won = true;
             break;
         }
@@ -407,6 +420,21 @@ bool change_face(std::map<int, char>& slots, int num, char letter) {
 }
 
 bool check_won(std::map<int, char>& slots, char letter) {
+
+
+    //Define a vactor of maps with 9 maps
+       //Display
+       /*
+               1   2   3
+
+               4   5   6
+
+               7   8   9
+
+               to win (the values of the maps of the following must be the same... either (' X ' or ' O ')
+        (1 == 4 == 7) || (2 == 5 == 8) || (3 == 6 == 9) || (1 == 2 == 3) || ( 4 == 5 == 6 ) || (7 == 8 == 9 ) || (1 == 5 == 9) || (3 == 5 == 7)
+
+       */
     bool won{ false };
 
     auto it1 = slots.find(1);
@@ -475,18 +503,68 @@ bool check_won(std::map<int, char>& slots, char letter) {
     return won;
 }
 
+bool record(string player1, string player2, string winner) {
+    bool status{ false };
 
+    std::ofstream out_file("record.txt", std::ios::app);
+    if (!out_file) {
+        cerr << "ERROR OPENING FILE" << endl;
+    }
+    else {
+        out_file << player1 << "#" << player2 << "#" << winner << endl;
+        status = true;
+    }
+    out_file.close();
+    return status;
+}
 
-//Define a vactor of maps with 9 maps
-   //Display
-   /*
-           1   2   3
+void check_record() {
+    system("CLS");
+    std::ofstream out_file("record.txt", std::ios::app);
+    out_file.close();
+    vector<string> games;
 
-           4   5   6
+    std::ifstream in_file("record.txt");
+    if (!in_file) {
+        cerr << "ERROR OPENING FILE\n";
+    }
+    else {
+        string line;
+        int line_count{ 0 };
+        while (getline(in_file, line)) {
+            games.push_back(line);
+            line_count++;
+        }
+        //When there are no lines at the moment
+        if (line_count == 0) {
+            cout << endl << "RECORDS ARE EMPTY  -- SET THE RECORDS NOW WITH THOSE WHO DARE TO CHALLENGE YOU\n";
 
-           7   8   9
+            cout << "\n\n\t\tWOULD YOU LIKE TO PLAY?\n1 - YES\n2 - NO\n";
+            int opt = input_validator(1, 2);
+            if (opt == 1) {
+                play_menu();
+            }
+        }
+        else {
+            cout << std::setw(20) << std::left << "PLAYER 1" << std::setw(20) << std::left << "PLAYER 2" << std::setw(24) << "WINNER" << endl<<endl;
+            for (size_t i{ 0 }; i < games.size(); i++) {
+                string current = games.at(i);
+                std::stringstream s_stream{ current };
+                vector<string> line;
+                string substr;
 
-           to win (the values of the maps of the following must be the same... either (' X ' or ' O ')
-    (1 == 4 == 7) || (2 == 5 == 8) || (3 == 6 == 9) || (1 == 2 == 3) || ( 4 == 5 == 6 ) || (7 == 8 == 9 ) || (1 == 5 == 9) || (3 == 5 == 7)
+                while (s_stream.good()) {
+                    getline(s_stream, substr, '#');
+                    line.push_back(substr);
+                }
+                cout << std::setw(20) << std::left << line.at(0) << std::setw(20) << std::left << line.at(1) << std::setw(24) << line.at(2) << endl;
+                
+            }
+        }
+    }
+    in_file.close();
+}
 
-   */
+void about() {
+
+}
