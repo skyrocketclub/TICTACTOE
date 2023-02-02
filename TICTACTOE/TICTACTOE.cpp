@@ -598,8 +598,10 @@ void check_record() {
                 play_menu();
             }
         }
-        else {
+        else {     
+            cout << "----------------------------------------------\n";
             cout << std::setw(20) << std::left << "PLAYER 1" << std::setw(20) << std::left << "PLAYER 2" << std::setw(24) << "WINNER" << endl<<endl;
+            cout << "----------------------------------------------\n";
             for (size_t i{ 0 }; i < games.size(); i++) {
                 string current = games.at(i);
                 std::stringstream s_stream{ current };
@@ -613,6 +615,7 @@ void check_record() {
                 cout << std::setw(20) << std::left << line.at(0) << std::setw(20) << std::left << line.at(1) << std::setw(24) << line.at(2) << endl;
                 
             }
+            cout << "----------------------------------------------\n";
         }
     }
     in_file.close();
